@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace AdventOfCode
 {
-	class Program2
+	internal class Program2
 	{
-		static void Main2(string[] args)
+		private static void Main2(string[] args)
 		{
 			var input = File.ReadAllText("input2.txt").Split(',').Select(int.Parse).ToArray();
 
@@ -21,7 +21,7 @@ namespace AdventOfCode
 					memory[1] = noun;
 					memory[2] = verb;
 
-					int position = 0;
+					var position = 0;
 					while (true)
 					{
 						var opcode = memory[position];
@@ -32,17 +32,10 @@ namespace AdventOfCode
 						position += 4;
 
 						if (opcode == 1)
-						{
 							memory[outputPosition] = memory[input1Position] + memory[input2Position];
-						}
 						else if (opcode == 2)
-						{
 							memory[outputPosition] = memory[input1Position] * memory[input2Position];
-						}
-						else if (opcode == 99)
-						{
-							break;
-						}
+						else if (opcode == 99) break;
 					}
 
 					if (memory[0] == 19690720)

@@ -5,30 +5,9 @@ using System.Linq;
 
 namespace AdventOfCode
 {
-	class Program3
+	internal class Program3
 	{
-		public readonly struct Line : IComparable<Line>
-		{
-			public readonly int X;
-			public readonly int Y;
-			public readonly int Steps;
-
-			public Line(int x, int y, int steps)
-			{
-				X = x;
-				Y = y;
-				Steps = steps;
-			}
-
-			public int CompareTo(Line other)
-			{
-				var xComparison = X.CompareTo(other.X);
-				if (xComparison != 0) return xComparison;
-				return Y.CompareTo(other.Y);
-			}
-		}
-
-		static void Main3(string[] args)
+		private static void Main3(string[] args)
 		{
 			var file = File.ReadAllText("input3.txt");
 			var fileSplit = file.Split('\n');
@@ -88,36 +67,28 @@ namespace AdventOfCode
 					case 'U':
 					{
 						for (var i = 0; i < number; i++)
-						{
 							positions.Add(new Line(posX, ++posY, ++steps));
-						}
 
 						break;
 					}
 					case 'D':
 					{
 						for (var i = 0; i < number; i++)
-						{
 							positions.Add(new Line(posX, --posY, ++steps));
-						}
 
 						break;
 					}
 					case 'R':
 					{
 						for (var i = 0; i < number; i++)
-						{
 							positions.Add(new Line(++posX, posY, ++steps));
-						}
 
 						break;
 					}
 					case 'L':
 					{
 						for (var i = 0; i < number; i++)
-						{
 							positions.Add(new Line(--posX, posY, ++steps));
-						}
 
 						break;
 					}
@@ -127,6 +98,27 @@ namespace AdventOfCode
 			}
 
 			return positions.OrderBy(x => x).ToList();
+		}
+
+		public readonly struct Line : IComparable<Line>
+		{
+			public readonly int X;
+			public readonly int Y;
+			public readonly int Steps;
+
+			public Line(int x, int y, int steps)
+			{
+				X = x;
+				Y = y;
+				Steps = steps;
+			}
+
+			public int CompareTo(Line other)
+			{
+				var xComparison = X.CompareTo(other.X);
+				if (xComparison != 0) return xComparison;
+				return Y.CompareTo(other.Y);
+			}
 		}
 	}
 }
