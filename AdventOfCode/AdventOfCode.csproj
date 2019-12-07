@@ -9,6 +9,8 @@
     <None Remove="input.txt" />
     <None Remove="input2.txt" />
     <None Remove="input3.txt" />
+    <None Remove="input5.txt" />
+    <None Remove="input6.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +24,12 @@
 
   <ItemGroup>
     <Content Include="input2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="input6.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="input5.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

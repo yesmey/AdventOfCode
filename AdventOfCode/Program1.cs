@@ -6,7 +6,7 @@ namespace AdventOfCode
 {
 	internal class Program1
 	{
-		private static void Main(string[] args)
+		private static void Main1(string[] args)
 		{
 			var input = File.ReadAllLines("input.txt").Select(double.Parse).ToArray();
 			var sum = 0.0;

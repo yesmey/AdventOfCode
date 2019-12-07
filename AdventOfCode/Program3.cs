@@ -10,10 +10,8 @@ namespace AdventOfCode
 		private static void Main3(string[] args)
 		{
 			var file = File.ReadAllText("input3.txt");
-			var fileSplit = file.Split('\n');
-			var firstWire = fileSplit[0];
-			var secondWire = fileSplit[1];
-
+			var (firstWire, secondWire) = file.Split('\n');
+		
 			var input1 = firstWire.Split(',');
 			var input2 = secondWire.Split(',');
 

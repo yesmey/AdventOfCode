@@ -35,7 +35,8 @@ namespace AdventOfCode
 							memory[outputPosition] = memory[input1Position] + memory[input2Position];
 						else if (opcode == 2)
 							memory[outputPosition] = memory[input1Position] * memory[input2Position];
-						else if (opcode == 99) break;
+						else if (opcode == 99)
+							break;
 					}
 
 					if (memory[0] == 19690720)
