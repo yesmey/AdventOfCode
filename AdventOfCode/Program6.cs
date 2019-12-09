@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using System.Threading.Channels;
 
 namespace AdventOfCode
 {
 	internal class Program6
 	{
-		private static void Main(string[] args)
+		private static void Main6(string[] args)
 		{
 			var input = File.ReadAllLines("input6.txt")
 				.Select(x => x.Split(')'))

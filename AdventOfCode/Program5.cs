@@ -6,172 +6,187 @@ namespace AdventOfCode
 {
 	internal class Program5
 	{
-		private static void Main5(string[] args)
+		public enum PositonMode
 		{
-			var input = File.ReadAllText("input5.txt").Split(',').Select(int.Parse).ToArray();
+			Immediate,
+			Positon
+		}
 
-			var memory = new int[input.Length];
-			Array.Copy(input, memory, input.Length);
+		public enum Opcode
+		{
+			Unknown = 0,
+			Addition = 1,
+			Multiply = 2,
+			ReadInput = 3,
+			WriteOutput = 4,
+			JumpNotZero = 5,
+			JumpEqualZero = 6,
+			IsLessThan = 7,
+			IsEqual = 8,
+			Quit = 99
+		}
 
-			var position = 0;
+		public class State
+		{
+			public int ReadPosition { get; set; }
+			public Opcode Opcode { get; set; }
+			public PositonMode[] ParameterModes { get; set; }
 
-			int ReadValue(bool immediateMode = false)
+			public void Reset()
 			{
-				if (immediateMode)
+				ReadPosition = 0;
+				ParameterModes = new[]
 				{
-					return memory[position++];
-				}
-				else
-				{
-					return memory[memory[position++]];
-				}
+					PositonMode.Immediate,
+					PositonMode.Positon,
+					PositonMode.Positon,
+					PositonMode.Positon
+				};
+			}
+		}
+
+		public class Computer
+		{
+			private readonly int[] _memory;
+			private int _position;
+			private readonly State _currentState;
+
+			public Computer(int[] memory)
+			{
+				_memory = memory;
+				_position = 0;
+				_currentState = new State();
 			}
 
-			void StoreValue(int value, bool immediateMode = false)
+			private void ParseState()
 			{
-				if (immediateMode)
-				{
-					memory[position++] = value;
-				}
-				else
-				{
-					memory[memory[position++]] = value;
-				}
-			}
+				_currentState.Reset();
 
-			while (true)
-			{
-				var opcode = memory[position++];
-
-				if (opcode == 1)
-				{
-					var input1 = ReadValue();
-					var input2 = ReadValue();
-					StoreValue(input1 + input2);
-				}
-				else if (opcode == 2)
-				{
-					var input1 = ReadValue();
-					var input2 = ReadValue();
-					StoreValue(input1 * input2);
-				}
-				else if (opcode == 3)
-				{
-					Console.WriteLine("ENTER VALUE");
-					var input1Position = memory[position++];
-					var inputValue = int.Parse(Console.ReadLine());
-					memory[input1Position] = inputValue;
-				}
-				else if (opcode == 4)
-				{
-					Console.WriteLine(ReadValue());
-				}
-				else if (opcode == 5)
-				{
-					if (ReadValue() != 0)
-					{
-						position = ReadValue();
-					}
-					else
-					{
-						position++;
-					}
-				}
-				else if (opcode == 6)
-				{
-					if (ReadValue() == 0)
-					{
-						position = ReadValue();
-					}
-					else
-					{
-						position++;
-					}
-				}
-				else if (opcode == 7)
-				{
-					var input1 = ReadValue();
-					var input2 = ReadValue();
-					StoreValue(input1 < input2 ? 1 : 0);
-				}
-				else if (opcode == 8)
-				{
-					var input1 = ReadValue();
-					var input2 = ReadValue();
-					StoreValue(input1 == input2 ? 1 : 0);
-				}
-				else if (opcode == 99)
-				{
-					break;
-				}
-				else if (opcode > 100)
+				var opcode = ReadValue();
+				if (opcode > 100)
 				{
 					var opcodeString = opcode.ToString().PadLeft(5, '0');
-					var parameter3Mode = opcodeString[0] == '1';
-					var parameter2Mode = opcodeString[1] == '1';
-					var parameter1Mode = opcodeString[2] == '1';
-					var opcode2 = int.Parse($"{opcodeString[3]}{opcodeString[4]}");
+					for (var i = 0; i < 3; i++)
+					{
+						if (opcodeString[i] == '1')
+						{
+							_currentState.ParameterModes[3 - i] = PositonMode.Immediate;
+						}
+					}
 
-					if (opcode2 == 1)
-					{
-						var parameter1 = ReadValue(parameter1Mode);
-						var parameter2 = ReadValue(parameter2Mode);
-						StoreValue(parameter1 + parameter2, parameter3Mode);
-					}
-					else if (opcode2 == 2)
-					{
-						var parameter1 = ReadValue(parameter1Mode);
-						var parameter2 = ReadValue(parameter2Mode);
-						StoreValue(parameter1 * parameter2, parameter3Mode);
-					}
-					else if (opcode2 == 3)
-					{
-						var inputValue = int.Parse(Console.ReadLine());
-						StoreValue(inputValue, parameter1Mode);
-					}
-					else if (opcode2 == 4)
-					{
-						var parameter1 = ReadValue(parameter2Mode);
-						Console.WriteLine(parameter1);
-					}
-					else if (opcode2 == 5)
-					{
-						if (ReadValue(parameter1Mode) != 0)
-						{
-							position = ReadValue(parameter2Mode);
-						}
-						else
-						{
-							position++;
-						}
-					}
-					else if (opcode2 == 6)
-					{
-						if (ReadValue(parameter1Mode) == 0)
-						{
-							position = ReadValue(parameter2Mode);
-						}
-						else
-						{
-							position++;
-						}
-					}
-					else if (opcode2 == 7)
-					{
-						var input1 = ReadValue(parameter1Mode);
-						var input2 = ReadValue(parameter2Mode);
-						StoreValue(input1 < input2 ? 1 : 0, parameter3Mode);
-					}
-					else if (opcode2 == 8)
-					{
-						var input1 = ReadValue(parameter1Mode);
-						var input2 = ReadValue(parameter2Mode);
-						StoreValue(input1 == input2 ? 1 : 0, parameter3Mode);
-					}
+					opcode = int.Parse($"{opcodeString[3]}{opcodeString[4]}");
 				}
 
-				Console.WriteLine("CURRENT POS: " + position);
+				_currentState.Opcode = (Opcode)opcode;
 			}
+
+			public int Parse()
+			{
+				int resultValue = -1;
+				while (true)
+				{
+					ParseState();
+
+					if (_currentState.Opcode == Opcode.Addition)
+					{
+						var parameter1 = ReadValue();
+						var parameter2 = ReadValue();
+						StoreValue(parameter1 + parameter2);
+					}
+					else if (_currentState.Opcode == Opcode.Multiply)
+					{
+						var parameter1 = ReadValue();
+						var parameter2 = ReadValue();
+						StoreValue(parameter1 * parameter2);
+					}
+					else if (_currentState.Opcode == Opcode.ReadInput)
+					{
+						Console.WriteLine("Write input");
+						var inputValue = int.Parse(Console.ReadLine());
+						StoreValue(inputValue);
+					}
+					else if (_currentState.Opcode == Opcode.WriteOutput)
+					{
+						resultValue = ReadValue();
+					}
+					else if (_currentState.Opcode == Opcode.JumpNotZero)
+					{
+						var value = ReadValue();
+						var position = ReadValue();
+						if (value != 0)
+						{
+							_position = position;
+							_currentState.ReadPosition = 0;
+						}
+					}
+					else if (_currentState.Opcode == Opcode.JumpEqualZero)
+					{
+						var value = ReadValue();
+						var position = ReadValue();
+						if (value == 0)
+						{
+							_position = position;
+							_currentState.ReadPosition = 0;
+						}
+					}
+					else if (_currentState.Opcode == Opcode.IsLessThan)
+					{
+						var input1 = ReadValue();
+						var input2 = ReadValue();
+						StoreValue(input1 < input2 ? 1 : 0);
+					}
+					else if (_currentState.Opcode == Opcode.IsEqual)
+					{
+						var input1 = ReadValue();
+						var input2 = ReadValue();
+						StoreValue(input1 == input2 ? 1 : 0);
+					}
+					else if (_currentState.Opcode == Opcode.Quit)
+					{
+						return resultValue;
+					}
+
+					_position += _currentState.ReadPosition;
+				}
+			}
+
+			private int ReadValue()
+			{
+				var readPosition = _currentState.ReadPosition++;
+
+				var mode = _currentState.ParameterModes[readPosition];
+				if (mode == PositonMode.Immediate)
+				{
+					return _memory[_position + readPosition];
+				}
+				else
+				{
+					return _memory[_memory[_position + readPosition]];
+				}
+			}
+
+			private void StoreValue(int value)
+			{
+				var readPosition = _currentState.ReadPosition++;
+
+				var mode = _currentState.ParameterModes[readPosition];
+				if (mode == PositonMode.Immediate)
+				{
+					_memory[_position + readPosition] = value;
+				}
+				else
+				{
+					_memory[_memory[_position + readPosition]] = value;
+				}
+			}
+		}
+
+		public static void Main5(string[] args)
+		{
+			var input = File.ReadAllText("input5.txt").Split(',').Select(int.Parse).ToArray();
+			var intComputer = new Computer(input);
+			var result = intComputer.Parse();
+			Console.WriteLine(result);
 		}
 	}
 }
